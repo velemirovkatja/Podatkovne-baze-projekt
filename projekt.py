@@ -21,59 +21,36 @@ def dodaj_projekcijo(film, termin, cena):
 
 # vstopnica za določeno projekcijo
 def prodajVstopnico(projekcija, sedez):
-    '''Proda vstopnico za dani sedež na projekciji in vrne id vstopnice.'''
+    '''Proda vstopnico za dani sedež na projekciji in vrne slovar podatkov za izpis vstopnice.'''
 
     # Preveri, da sta dvorani sedeža in projekcije enaki
     with baza:
         baza.execute("""SELECT dvorana FROM sedež WHERE id = ?""", [sedez])
-        dvorana_sedez = baza.fetchone()
         baza.execute("""SELECT dvorana FROM projekcija WHERE id = ?""", [projekcija])
-        dvorana_projekcija = baza.fetchone()
+        # dodamo še fetchone in preverimo, če se številki ujemata - takrat sta enaka sedeža
         
-    # dvorana sedeža ni enaka dvorani, v kateri je projekcija
-    if dvorana_sedez != dvorana_projekcija:
+    # Sedež na vstopnici ni enak sedežu v dvorani
+    if not sedez = številka_sedeža:
         raise Exception("Dvorani sedeža in projekcije nista enaki.")
 
-    cur = baza.cursor()
-    cur.execute("""INSERT INTO vstopnica (projekcija, sedež) VALUES (?, ?)""", [projekcija, sedez])
-    id = cur.lastrowid
-
-    # vrne id vstopnice
-    return id
-
-def podatkiZaIzpisVstopnice(vstopnica):
-    ''' Podatki o filmu, ki so zapisani na vstopnici.'''
-
     with baza:
-        baza.execute("""SELECT film FROM projekcija""")
-        naslov = baza.fetchone()
-        baza.execute("""SELECT dvorana FROM projekcija""")
-        dvorana = baza.fetchone()
-        baza.execute("""SELECT sedež FROM vstopnica""")
-        sedez = baza.fetchone()
-        baza.execute("""SELECT termin_predstave FROM projekcija""")
-        termin = baza.fetchone()
-        baza.execute("""SELECT cena FROM projekcija""")
-        cena = baza.fetchone()
+        baza.execute("""INSERT INTO vstopnica (projekcija, sedež) VALUES (?, ?)""", [projekcija, sedez])
 
-    potatkiNaVstopnici = {
-        "naslov_filma": naslov
-        "dvorana": dvorana
-        "sedez": sedez
-        "termin_predstave": termin
-        "cena": cena
-    }
+    # Poišči ime filma - vrnemo podatke o filmu oz. o projekciji
+    slovarFilmov = {}
+    
+        
 
-    return podatkiNaVstopnici
- 
+# v kateri dvorani je predstava - zapišemo na vstopnico
+def kateraDvorana():
+    with baza:
+        baza.execute("""INSERT INTO vstopnica (dvorana) SELECT id FROM dvorana""")
+
+
+# na katerem sedežu v dvorani sedimo - zapišemo na vstopnico
+def kateriSedez():
+    with baza:
+        baza.execute("""INSERT INTO vstopnica (sedež) SELECT id FROM sedež""")
     
 
 baza = sqlite3.connect(datoteka_baze, isolation_level = None)
-
-# bottle:
-
-def nakup():
-    vstopnica = prodajVstopnico()
-    podatki = prodatkiZaIzpis(vstopnica)
-    #podatke daj v HTML
-    
